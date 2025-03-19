@@ -1,105 +1,141 @@
 <template>
-  <div>
-    <v-container>
-      <v-card class="pa-4">
-        <v-container>
-          <v-card-title>회원가입</v-card-title>
-          <v-form @submit.prevent="onSubmitForm">
-            <v-text-field
-              v-model="email"
-              label="이메일"
+  <div class="container mt-5">
+    <div class="card p-4">
+      <div class="card-body">
+        <h3 class="card-title text-center mb-4">회원가입</h3>
+        <form @submit.prevent="onSubmitForm" novalidate>
+          <!-- 이메일 입력 -->
+          <div class="mb-3 position-relative">
+            <label for="email" class="form-label">이메일</label>
+            <input
               type="email"
-              :rules="emailRules"
+              class="form-control"
+              id="email"
+              v-model="email"
+              @input="validateEmail"
+              :class="{ 'is-invalid': email && !emailValid, 'is-valid': emailValid }"
               required
             />
+            <div class="invalid-feedback">올바른 이메일 주소를 입력하세요.</div>
+            <div class="valid-feedback">올바른 이메일 형식입니다!</div>
+          </div>
 
-            <v-text-field
+          <!-- 비밀번호 입력 -->
+          <div class="mb-3 position-relative">
+            <label for="password" class="form-label">비밀번호</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
               v-model="password"
-              label="비밀번호"
-              type="password"
-              :rules="passwordRules"
+              @input="validatePassword"
+              :class="{ 'is-invalid': password && !passwordValid, 'is-valid': passwordValid }"
               required
             />
-            <v-text-field
+            <div class="invalid-feedback">비밀번호는 최소 6자 이상이어야 합니다.</div>
+            <div class="valid-feedback">사용 가능한 비밀번호입니다.</div>
+          </div>
+
+          <!-- 비밀번호 확인 -->
+          <div class="mb-3 position-relative">
+            <label for="passwordCheck" class="form-label">비밀번호 확인</label>
+            <input
+              type="password"
+              class="form-control"
+              id="passwordCheck"
               v-model="passwordCheck"
-              label="비밀번호 확인"
-              type="password"
-              :rules="passwordCheckRules"
+              @input="validatePasswordCheck"
+              :class="{
+                'is-invalid': passwordCheck && !passwordCheckValid,
+                'is-valid': passwordCheckValid,
+              }"
               required
             />
-            <v-text-field
-              v-model="nickname"
-              label="닉네임"
+            <div class="invalid-feedback">비밀번호가 일치하지 않습니다.</div>
+            <div class="valid-feedback">비밀번호가 일치합니다.</div>
+          </div>
+
+          <!-- 닉네임 입력 -->
+          <div class="mb-3 position-relative">
+            <label for="nickname" class="form-label">닉네임</label>
+            <input
               type="text"
-              :rules="nicknameRules"
+              class="form-control"
+              id="nickname"
+              v-model="nickname"
+              @input="validateNickname"
+              :class="{ 'is-invalid': nickname && !nicknameValid, 'is-valid': nicknameValid }"
               required
             />
-            <v-checkbox v-model="terms" label="동의하시겠습니까?" :rules="termsRules" required />
-            <v-btn color="green" type="submit">가입하기 </v-btn>
-          </v-form>
-        </v-container>
-      </v-card>
-    </v-container>
+            <div class="invalid-feedback">닉네임은 최소 2자 이상이어야 합니다.</div>
+            <div class="valid-feedback">사용 가능한 닉네임입니다.</div>
+          </div>
+
+          <!-- 약관 동의 -->
+          <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="terms" v-model="terms" required />
+            <label class="form-check-label" for="terms">동의하시겠습니까?</label>
+            <div class="invalid-feedback">약관에 동의해야 가입할 수 있습니다.</div>
+          </div>
+
+          <!-- 가입 버튼 -->
+          <button type="submit" class="btn btn-success w-100">가입하기</button>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+import { useUsersStore } from '@/store/users';
+import { useHead } from '#imports';
 
 useHead({
   title: '회원가입',
 });
 
-// ✅ `ref()`를 사용하여 반응형 상태 생성
+// 반응형 상태
 const email = ref('');
 const password = ref('');
 const passwordCheck = ref('');
 const nickname = ref('');
 const terms = ref(false);
+const store = useUsersStore();
+const router = useRouter();
 
-// ✅ 유효성 검사 규칙 (rules 배열)
-const emailRules = [
-  (v) => !!v || '이메일은 필수입니다.',
-  (v) => /.+@.+\..+/.test(v) || '이메일이 유효하지 않습니다.',
-];
+// 유효성 검사 함수
+const emailValid = computed(() => /.+@.+\..+/.test(email.value));
+const passwordValid = computed(() => password.value.length >= 6);
+const passwordCheckValid = computed(
+  () => password.value.length >= 6 && password.value === passwordCheck.value
+);
+const nicknameValid = computed(() => nickname.value.length >= 2);
 
-const passwordRules = [
-  (v) => !!v || '비밀번호는 필수입니다.',
-  (v) => v.length >= 6 || '비밀번호는 최소 6자 이상이어야 합니다.',
-];
+// 실시간 유효성 검사 (입력 도중에도 반응)
+const validateEmail = () => {};
+const validatePassword = () => {};
+const validatePasswordCheck = () => {};
+const validateNickname = () => {};
 
-const passwordCheckRules = [
-  (v) => !!v || '비밀번호 확인을 입력하세요.',
-  (v) => v === password.value || '비밀번호가 일치하지 않습니다.',
-];
-
-const nicknameRules = [
-  (v) => !!v || '닉네임은 필수입니다.',
-  (v) => v.length >= 2 || '닉네임은 최소 2자 이상이어야 합니다.',
-];
-
-const termsRules = [(v) => v || '약관에 동의해야 가입할 수 있습니다.'];
-
-// ✅ 유효성 검사 (모든 필드가 조건을 충족해야 유효)
-const valid = computed(() => {
-  return (
-    email.value.match(/.+@.+\..+/) &&
-    password.value.length >= 6 &&
-    password.value === passwordCheck.value &&
-    nickname.value.length >= 2 &&
-    terms.value
-  );
-});
-
-// ✅ 회원가입 버튼 클릭 시 실행할 함수
+// 가입 버튼 클릭 시 실행
 const onSubmitForm = () => {
-  if (valid.value) {
-    console.log('회원가입 데이터:', {
+  if (
+    emailValid.value &&
+    passwordValid.value &&
+    passwordCheckValid.value &&
+    nicknameValid.value &&
+    terms.value
+  ) {
+    // user store의 모듈을 사용.
+    store.signUp({
       email: email.value,
-      password: password.value,
       nickname: nickname.value,
-      terms: terms.value,
     });
+    router.push('/');
+
     alert('회원가입 완료!');
   } else {
     alert('입력 정보를 확인해주세요.');
@@ -107,4 +143,6 @@ const onSubmitForm = () => {
 };
 </script>
 
-<style></style>
+<style>
+/* Bootstrap이 적용되어 있어야 함 */
+</style>

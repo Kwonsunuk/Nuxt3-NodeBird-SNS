@@ -4,20 +4,24 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev ",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint ."
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
     "@nuxt/eslint": "^1.2.0",
     "@nuxt/icon": "^1.11.0",
     "@nuxt/test-utils": "^3.17.2",
+    "@pinia/nuxt": "^0.10.1",
     "nuxt": "^3.16.0",
+    "usebootstrap": "^3.5.100",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
-    "vuetify-nuxt-module": "^0.18.3"
+    "vuetify-nuxt-module": "^0.18.3",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.26.1",
