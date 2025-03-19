@@ -1,1 +1,0 @@
-export { default } from "file:///Volumes/SN770/Study/Node-Bird/node_modules/@nuxt/vite-builder/dist/runtime/client.manifest.mjs"
