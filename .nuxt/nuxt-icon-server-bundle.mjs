@@ -12,4 +12,5 @@ function createRemoteCollection(fetchEndpoint) {
 }
 
 export const collections = {
+  'bi': () => require('@iconify-json/bi/icons.json'),
 }

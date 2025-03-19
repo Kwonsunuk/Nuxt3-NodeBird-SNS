@@ -13,6 +13,8 @@ declare module "#build/plugins.server.mjs";
 declare module "#build/test-component-wrapper.mjs";
 declare module "#build/vuetify-nuxt-plugin.client.mjs";
 declare module "#build/vuetify-nuxt-plugin.server.mjs";
+declare module "#build/image-options.mjs";
+declare module "#build/unocss.mjs";
 declare module "#build/devtools/settings.mjs";
 declare module "#build/runtime.vue-devtools-client.fL3mm6wWXRZJQp_2EqF8Q_DbkSzAXCZsMjnGPL6tsA4.js";
 declare module "#build/routes.mjs";
