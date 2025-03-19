@@ -1,22 +1,38 @@
+<!-- index.vue -->
 <template>
-  <v-container>
-    <div>
-      <PostCard />
-      <PostCard />
-      <PostCard />
-      <PostCard />
-      <PostCard />
-      <PostCard />
+  <div class="container mt-5">
+    <PostForm v-if="me" />
+    <div class="row">
+      <div class="col-12 mb-4" v-for="p in mainPosts" :key="p.id">
+        <PostCard
+          :post="p"
+          :activeCommentPostId="activeCommentPostId"
+          @toggle-comment="toggleComment"
+        />
+      </div>
     </div>
-  </v-container>
+  </div>
 </template>
 
 <script setup>
-import PostCard from '../components/PostCard.vue';
+import { storeToRefs } from 'pinia';
+import { ref } from 'vue';
 
-useHead({
-  title: '메인 페이지',
-});
+import PostCard from '@/components/PostCard.vue';
+import PostForm from '@/components/PostForm.vue';
+import { usePostsStore } from '~/store/posts';
+import { useUsersStore } from '~/store/users';
+
+const userStore = useUsersStore();
+const { me } = storeToRefs(userStore);
+const postStore = usePostsStore();
+const { mainPosts } = storeToRefs(postStore);
+
+const activeCommentPostId = ref(null);
+
+const toggleComment = (postId) => {
+  activeCommentPostId.value = activeCommentPostId.value === postId ? null : postId;
+};
 </script>
 
 <style></style>
