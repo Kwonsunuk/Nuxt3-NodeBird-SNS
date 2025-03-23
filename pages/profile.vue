@@ -1,3 +1,4 @@
+<!-- pages/profile.vue -->
 <template>
   <div class="container mt-5">
     <div class="card mb-3">
@@ -22,61 +23,61 @@
     <div class="card mb-3">
       <div class="card-body">
         <h5 class="card-title">팔로잉</h5>
-        <FollowList :list="following" :message="followingMessage" @remove="removeFollowing" />
+        <FollowList
+          :list="userStore.followingList"
+          :message="followingMessage"
+          @remove="removeFollowing"
+        />
+        <b-button
+          v-if="hasMoreFollowing"
+          color="outline-secondary"
+          style="width: 100%"
+          @click="userStore.loadMoreFollowings()"
+        >
+          더보기..
+        </b-button>
       </div>
     </div>
     <div class="card mb-3">
       <div class="card-body">
         <h5 class="card-title">팔로워</h5>
-        <FollowList :list="followers" :message="followerMessage" @remove="removeFollower" />
+        <FollowList
+          :list="userStore.followerList"
+          :message="followerMessage"
+          @remove="removeFollower"
+        />
+        <b-button
+          v-if="hasMoreFollower"
+          color="outline-secondary"
+          style="width: 100%"
+          @click="userStore.loadMoreFollowers()"
+        >
+          더보기..
+        </b-button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onUnmounted, ref } from 'vue';
+import { computed, onUnmounted, ref } from 'vue';
 
-import { useHead } from '#imports';
 import { useUsersStore } from '~/store/users';
 
 import FollowList from '../components/FollowList.vue';
 
-useHead({ title: '프로필' });
+definePageMeta({
+  title: '프로필',
+  middleware: 'authenticated',
+});
 
 const userStore = useUsersStore();
 const nickname = ref(userStore.me?.nickname ?? '');
-const following = ref([
-  { id: 1, name: '제로초초초' },
-  { id: 2, name: '우기' },
-  { id: 3, name: '차차' },
-]);
-const followers = ref([
-  { id: 4, name: '홍길동' },
-  { id: 5, name: '이순신' },
-  { id: 6, name: '장보고' },
-]);
 const followingMessage = ref('');
 const followerMessage = ref('');
 const successTimeout = ref(null);
-
-const removeFollowing = (id) => {
-  const target = following.value.find((item) => item.id === id);
-  if (target) {
-    following.value = following.value.filter((item) => item.id !== id);
-    followingMessage.value = `${target.name}의 팔로잉이 취소되었습니다.`;
-    successTimeout.value = setTimeout(() => (followingMessage.value = ''), 3000);
-  }
-};
-
-const removeFollower = (id) => {
-  const target = followers.value.find((item) => item.id === id);
-  if (target) {
-    followers.value = followers.value.filter((item) => item.id !== id);
-    followerMessage.value = `${target.name}의 팔로워를 해제하였습니다.`;
-    successTimeout.value = setTimeout(() => (followerMessage.value = ''), 3000);
-  }
-};
+const hasMoreFollower = computed(() => userStore.hasMoreFollower);
+const hasMoreFollowing = computed(() => userStore.hasMoreFollowing);
 
 onUnmounted(() => {
   if (successTimeout.value) {
@@ -84,10 +85,29 @@ onUnmounted(() => {
   }
 });
 
+const removeFollowing = (id) => {
+  const target = userStore.followingList.find((item) => item.id === id);
+  if (target) {
+    userStore.removeFollowing(id);
+    followingMessage.value = `${target.name}의 팔로잉이 취소되었습니다.`;
+    successTimeout.value = setTimeout(() => (followingMessage.value = ''), 3000);
+  }
+};
+
+const removeFollower = (id) => {
+  const target = userStore.followerList.find((item) => item.id === id);
+  if (target) {
+    userStore.removeFollower(id);
+    followerMessage.value = `${target.name}의 팔로워를 해제하였습니다.`;
+    successTimeout.value = setTimeout(() => (followerMessage.value = ''), 3000);
+  }
+};
+
 const onSubmitForm = () => {
   if (nickname.value.trim().length > 0) {
     userStore.changeNickname(nickname.value);
     alert(`닉네임이 "${nickname.value}"(으)로 변경되었습니다.`);
+    nickname.value = userStore.me.nickname; // 동기화
   } else {
     alert('닉네임을 입력하세요.');
   }

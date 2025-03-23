@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  pages: true,
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
   modules: [
@@ -9,6 +10,7 @@ export default defineNuxtConfig({
     'vuetify-nuxt-module',
     'usebootstrap',
     '@pinia/nuxt',
+    '@vueuse/nuxt',
   ],
   app: {
     head: {

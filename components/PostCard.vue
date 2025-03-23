@@ -1,4 +1,4 @@
-<!-- PostCard.vue -->
+<!-- components/PostCard.vue -->
 <template>
   <div>
     <div class="card mb-4 shadow-sm">
@@ -10,8 +10,10 @@
     /> -->
 
       <div class="card-body">
-        <h5 class="card-title">{{ post.author.nickname }}</h5>
-        <p class="card-text">{{ post.content }}</p>
+        <h5 class="card-title">
+          <NuxtLink :to="`/user/${post.id}`">{{ post.author.nickname }}</NuxtLink>
+        </h5>
+        <div class="card-text">{{ post.content }}</div>
       </div>
 
       <div class="card-footer d-flex justify-content-around bg-white border-top">
@@ -50,7 +52,7 @@
     </div>
     <!-- 템플릿은 ~~일 때 사용한다. -->
     <template v-if="activeCommentPostId === post.id">
-      <ul class="list-group list-group-flush">
+      <ul class="list-group list-group-flush mt-3">
         <li v-for="c in post.comments" :key="c.id" class="list-group-item d-flex align-items-start">
           <div
             class="avatar bg-teal text-white rounded-circle d-flex justify-content-center align-items-center me-3"
@@ -101,7 +103,7 @@ const onEditPost = () => {
 };
 </script>
 
-<style>
+<style scoped>
 /* 추가적인 카드 스타일이 필요하면 여기에 작성 */
 .dropdown:hover .dropdown-menu {
   display: block;
@@ -111,5 +113,9 @@ const onEditPost = () => {
   min-width: auto; /* 기본 min-width 제거 */
   width: max-content; /* 내용 크기에 맞게 자동 조정 */
   padding: 0.5rem; /* 메뉴 안쪽 여백 조절 */
+}
+a {
+  color: inherit;
+  text-decoration: none;
 }
 </style>
