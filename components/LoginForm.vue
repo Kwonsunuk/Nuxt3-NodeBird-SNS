@@ -53,6 +53,7 @@
 
 <script setup>
 import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { useUsersStore } from '~/store/users';
 
@@ -60,8 +61,9 @@ import { useUsersStore } from '~/store/users';
 const email = ref('');
 const password = ref('');
 const formValid = ref(false);
-const store = useUsersStore();
-const me = computed(() => store.me);
+const userStore = useUsersStore();
+const { me } = storeToRefs(userStore); // ✅ store의 me 상태를 반응형으로 가져온다.
+const router = useRouter();
 
 // 유효성 검사
 const emailValid = computed(() => /.+@.+\..+/.test(email.value));
@@ -75,17 +77,18 @@ const validateForm = () => {
 // 로그인 처리 함수
 const onSubmit = () => {
   if (formValid.value) {
-    store.logIn({
+    userStore.logIn({
       email: email,
     });
     alert('로그인 성공!');
+    router.push('/');
   } else {
     alert('입력 정보를 확인하세요.');
   }
 };
 
 const onLogOut = () => {
-  store.logOut();
+  userStore.logOut();
 };
 </script>
 

@@ -3,8 +3,13 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 export const usePostsStore = defineStore('posts', () => {
-  // 상태: 메인 게시글 목록을 저장하는 배열
+  /** 상태: 메인 게시글 목록을 저장하는 배열
+   * 평균적으로 10개씩 끊어서 가지고 오며 10개씩 가져오다 5개만 가져오면
+   * 이제 마지막 페이지라는 것을 알 수 있는데 이때 hasMorePost가 false로 바뀌며
+   * 더 이상 서버에서 못 불러오게 막는다.
+   */
   const mainPosts = ref([]);
+  const hasMorePost = ref(true);
 
   // actions: 게시글 추가 메서드
   async function addMainPost(payload) {
@@ -44,11 +49,53 @@ export const usePostsStore = defineStore('posts', () => {
     }
   }
 
+  // 게시글을 불러오는 메서드(현재는 가짜 데이터 삽입)
+  const loading = ref(false);
+  const limit = 10;
+  const totalPosts = 51;
+
+  async function loadPosts() {
+    if (mainPosts.value.length === 0) {
+      hasMorePost.value = true; // 초기화 시점에 다시 true로
+    }
+    if (!hasMorePost.value || loading.value) return;
+    loading.value = true;
+
+    const diff = totalPosts - mainPosts.value.length;
+    const postCount = diff > limit ? limit : diff;
+
+    if (postCount <= 0) {
+      hasMorePost.value = false;
+      loading.value = false;
+      return;
+    }
+
+    const fakePost = Array(postCount)
+      .fill()
+      .map(() => ({
+        id: Date.now() + Math.random(),
+        author: { id: 1, nickname: '우기' },
+        content: `Hello Infinite~${Math.random()}`,
+        comments: [],
+        images: [],
+      }));
+
+    mainPosts.value = mainPosts.value.concat(fakePost);
+    hasMorePost.value = postCount === limit;
+    loading.value = false;
+  }
+
   // 댓글 추가 메서드
   function addComment(payload) {
-    const index = mainPosts.value.findIndex((v) => v.id === payload);
+    const index = mainPosts.value.findIndex((v) => v.id === payload.postId);
     if (index > -1) {
-      mainPosts.value[index].comments.unshift(payload);
+      const commentData = {
+        id: payload.id,
+        content: payload.content,
+        user: payload.user,
+      };
+      mainPosts.value[index].comments.unshift(commentData);
+      // console.log('추가된 댓글:', mainPosts.value[index].comments);
     }
   }
 
@@ -56,6 +103,9 @@ export const usePostsStore = defineStore('posts', () => {
     mainPosts,
     addMainPost,
     removeMainPost,
+    loadPosts,
     addComment,
+    hasMorePost,
+    loading,
   };
 });

@@ -1,3 +1,4 @@
+<!-- signup.vue -->
 <template>
   <div class="container mt-5">
     <div class="card p-4">
@@ -91,10 +92,10 @@ import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useUsersStore } from '@/store/users';
-import { useHead } from '#imports';
 
-useHead({
+definePageMeta({
   title: '회원가입',
+  middleware: 'anonymous',
 });
 
 // 반응형 상태
@@ -103,7 +104,8 @@ const password = ref('');
 const passwordCheck = ref('');
 const nickname = ref('');
 const terms = ref(false);
-const store = useUsersStore();
+const userStore = useUsersStore();
+const { me } = storeToRefs(userStore);
 const router = useRouter();
 
 // 유효성 검사 함수
@@ -130,13 +132,12 @@ const onSubmitForm = () => {
     terms.value
   ) {
     // user store의 모듈을 사용.
-    store.signUp({
+    userStore.signUp({
       email: email.value,
       nickname: nickname.value,
     });
-    router.push('/');
-
     alert('회원가입 완료!');
+    router.push('/');
   } else {
     alert('입력 정보를 확인해주세요.');
   }
